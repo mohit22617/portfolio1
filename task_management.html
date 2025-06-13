@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Your Personal Task Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .task-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .task-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        /* Priority colors */
+        .priority-low { border-left-color: #22c55e; } /* green-500 */
+        .priority-medium { border-left-color: #f59e0b; } /* amber-500 */
+        .priority-high { border-left-color: #ef4444; } /* red-500 */
+        
+        /* Custom Modal for alerts/confirmations */
+        .custom-alert-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .custom-alert-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .custom-alert-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .custom-alert-modal.show .custom-alert-content {
+             transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+    <div id="app" class="min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-white shadow-md sticky top-0 z-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-tasks text-2xl text-slate-700"></i>
+                        <h1 class="text-2xl font-bold text-slate-800">TaskMaster</h1>
+                    </div>
+                     <div id="auth-container" class="text-xs text-slate-500">
+                        Loading...
+                     </div>
+                    <button id="addTaskBtn" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2 transition-colors">
+                        <i class="fas fa-plus"></i>
+                        <span>New Task</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Filters -->
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="w-full sm:w-auto">
+                    <h2 class="text-lg font-semibold text-slate-700 mb-2">Filter by Status</h2>
+                    <div class="flex items-center bg-white p-1 rounded-lg shadow-sm">
+                        <button data-filter="all" class="filter-btn bg-slate-600 text-white px-4 py-2 rounded-md text-sm font-medium">All</button>
+                        <button data-filter="todo" class="filter-btn px-4 py-2 rounded-md text-sm font-medium">To Do</button>
+                        <button data-filter="inprogress" class="filter-btn px-4 py-2 rounded-md text-sm font-medium">In Progress</button>
+                        <button data-filter="completed" class="filter-btn px-4 py-2 rounded-md text-sm font-medium">Completed</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Board -->
+            <div id="task-board" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Task cards will be inserted here by JavaScript -->
+            </div>
+             <div id="no-tasks" class="hidden text-center py-16">
+                <i class="fas fa-folder-open text-6xl text-slate-400"></i>
+                <p class="mt-4 text-xl font-semibold text-slate-600">No tasks yet!</p>
+                <p class="text-slate-500">Click "New Task" to get started.</p>
+            </div>
+        </main>
+
+        <!-- Add/Edit Task Modal -->
+        <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-30">
+            <div class="bg-white rounded-xl shadow-2xl p-6 sm:p-8 w-full max-w-lg transform transition-all scale-95 opacity-0" id="modal-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="modalTitle" class="text-2xl font-bold text-slate-800">Add New Task</h2>
+                    <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    <div class="mb-4">
+                        <label for="taskTitle" class="block text-sm font-medium text-slate-600 mb-1">Title</label>
+                        <input type="text" id="taskTitle" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="taskDesc" class="block text-sm font-medium text-slate-600 mb-1">Description</label>
+                        <textarea id="taskDesc" rows="4" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="taskDueDate" class="block text-sm font-medium text-slate-600 mb-1">Due Date</label>
+                            <input type="date" id="taskDueDate" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none">
+                        </div>
+                        <div>
+                            <label for="taskPriority" class="block text-sm font-medium text-slate-600 mb-1">Priority</label>
+                            <select id="taskPriority" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none bg-white">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                    </div>
+                     <div class="mb-6">
+                        <label for="taskStatus" class="block text-sm font-medium text-slate-600 mb-1">Status</label>
+                        <select id="taskStatus" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none bg-white">
+                            <option value="todo">To Do</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancelModalBtn" class="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors">Cancel</button>
+                        <button type="submit" id="saveTaskBtn" class="px-6 py-2 rounded-lg bg-slate-700 text-white font-semibold hover:bg-slate-800 transition-colors">Save Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Custom Alert/Confirm Modal -->
+        <div id="customAlert" class="custom-alert-modal">
+            <div class="custom-alert-content">
+                <p id="customAlertMessage" class="text-slate-700 text-lg mb-6"></p>
+                <div id="customAlertButtons" class="flex justify-center gap-4">
+                    <!-- Buttons are added here dynamically -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // --- Your Firebase Configuration ---
+        // This object is provided by the environment. Do not change it.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'task-manager-default';
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // State variables
+        let currentUserId = null;
+        let tasks = [];
+        let currentFilter = 'all';
+        let unsubscribe = null; // To hold the onSnapshot unsubscribe function
+
+        // DOM Elements
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskModal = document.getElementById('taskModal');
+        const modalContent = document.getElementById('modal-content');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+        const taskForm = document.getElementById('taskForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const taskBoard = document.getElementById('task-board');
+        const noTasksDiv = document.getElementById('no-tasks');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const authContainer = document.getElementById('auth-container');
+        const customAlert = document.getElementById('customAlert');
+        const customAlertMessage = document.getElementById('customAlertMessage');
+        const customAlertButtons = document.getElementById('customAlertButtons');
+
+        // --- Custom Alert/Confirm Function ---
+        const showCustomConfirm = (message, onConfirm) => {
+            customAlertMessage.textContent = message;
+            customAlertButtons.innerHTML = `
+                <button id="confirmCancel" class="px-6 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors">Cancel</button>
+                <button id="confirmOk" class="px-6 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors">Delete</button>
+            `;
+            customAlert.classList.add('show');
+
+            const confirmOk = document.getElementById('confirmOk');
+            const confirmCancel = document.getElementById('confirmCancel');
+
+            const closeConfirm = () => {
+                customAlert.classList.remove('show');
+            };
+
+            confirmOk.onclick = () => {
+                onConfirm();
+                closeConfirm();
+            };
+            confirmCancel.onclick = closeConfirm;
+        };
+
+        const showCustomAlert = (message) => {
+             customAlertMessage.textContent = message;
+             customAlertButtons.innerHTML = `<button id="alertOk" class="px-6 py-2 rounded-lg bg-slate-700 text-white font-semibold hover:bg-slate-800 transition-colors">OK</button>`;
+             customAlert.classList.add('show');
+             document.getElementById('alertOk').onclick = () => {
+                 customAlert.classList.remove('show');
+             }
+        }
+
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in.
+                currentUserId = user.uid;
+                authContainer.innerHTML = `<p>User ID: <span class="font-semibold">${currentUserId}</span></p>`;
+                fetchTasks();
+            } else {
+                // User is signed out.
+                currentUserId = null;
+                authContainer.textContent = 'Not signed in.';
+                if (unsubscribe) unsubscribe(); // Detach the listener
+                tasks = [];
+                renderTasks();
+                signInAnonymously(auth).catch((error) => {
+                    console.error("Anonymous sign-in failed:", error);
+                    authContainer.textContent = 'Sign-in failed. Please refresh.';
+                });
+            }
+        });
+
+        // --- Modal Handling ---
+        const openModal = () => {
+            taskModal.classList.remove('hidden');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        };
+
+        const closeModal = () => {
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                taskModal.classList.add('hidden');
+            }, 200);
+        };
+
+        addTaskBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Add New Task';
+            taskForm.reset();
+            document.getElementById('taskId').value = '';
+            document.getElementById('taskStatus').value = 'todo';
+            openModal();
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelModalBtn.addEventListener('click', closeModal);
+        taskModal.addEventListener('click', (e) => {
+            if (e.target === taskModal) {
+                closeModal();
+            }
+        });
+
+        // --- Firestore Operations ---
+        const getTasksCollection = () => {
+            if (!currentUserId) throw new Error("User not authenticated");
+            return collection(db, `artifacts/${appId}/users/${currentUserId}/tasks`);
+        }
+
+        // Fetch tasks with real-time listener
+        const fetchTasks = () => {
+            if (unsubscribe) {
+                unsubscribe(); // Unsubscribe from previous listener if it exists
+            }
+            if (!currentUserId) return;
+
+            const tasksCollection = getTasksCollection();
+            unsubscribe = onSnapshot(tasksCollection, (snapshot) => {
+                tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderTasks();
+            }, (error) => {
+                console.error("Error fetching tasks: ", error);
+            });
+        };
+
+        // Save or Update Task
+        taskForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('taskId').value;
+            const taskData = {
+                title: document.getElementById('taskTitle').value,
+                description: document.getElementById('taskDesc').value,
+                dueDate: document.getElementById('taskDueDate').value,
+                priority: document.getElementById('taskPriority').value,
+                status: document.getElementById('taskStatus').value
+            };
+
+            try {
+                 const tasksCollection = getTasksCollection();
+                if (id) {
+                    // Update existing task
+                    const taskRef = doc(db, `artifacts/${appId}/users/${currentUserId}/tasks`, id);
+                    await updateDoc(taskRef, taskData);
+                } else {
+                    // Add new task
+                    await addDoc(tasksCollection, taskData);
+                }
+                closeModal();
+            } catch (error) {
+                console.error("Error saving task: ", error);
+                showCustomAlert("Could not save task. Please try again.");
+            }
+        });
+
+        // --- Task Rendering ---
+        const renderTasks = () => {
+            taskBoard.innerHTML = '';
+            const filteredTasks = tasks.filter(task => {
+                if (currentFilter === 'all') return true;
+                return task.status === currentFilter;
+            });
+
+            if (filteredTasks.length === 0) {
+                 noTasksDiv.classList.remove('hidden');
+            } else {
+                 noTasksDiv.classList.add('hidden');
+            }
+            
+            // Sort tasks: inprogress, todo, then completed.
+            filteredTasks.sort((a, b) => {
+                const statusOrder = { 'inprogress': 0, 'todo': 1, 'completed': 2 };
+                return statusOrder[a.status] - statusOrder[b.status];
+            });
+
+            filteredTasks.forEach(task => {
+                const taskCard = createTaskCard(task);
+                taskBoard.appendChild(taskCard);
+            });
+        };
+
+        // Create Task Card HTML
+        const createTaskCard = (task) => {
+            const card = document.createElement('div');
+            card.className = `task-card bg-white rounded-lg shadow-md p-5 flex flex-col justify-between border-l-4 priority-${task.priority}`;
+            card.dataset.id = task.id;
+
+            const statusColors = {
+                todo: 'bg-blue-100 text-blue-800',
+                inprogress: 'bg-yellow-100 text-yellow-800',
+                completed: 'bg-green-100 text-green-800'
+            };
+            const statusText = {
+                todo: 'To Do',
+                inprogress: 'In Progress',
+                completed: 'Completed'
+            };
+
+            const dueDate = task.dueDate ? new Date(task.dueDate + 'T00:00:00') : null;
+            const formattedDate = dueDate ? dueDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'No due date';
+            
+            let dateClass = 'text-slate-500';
+            if (dueDate && task.status !== 'completed') {
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                if (dueDate < today) {
+                    dateClass = 'text-red-500 font-semibold';
+                }
+            }
+
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">${task.title}</h3>
+                        <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusColors[task.status] || 'bg-gray-100 text-gray-800'}">
+                            ${statusText[task.status] || 'Unknown'}
+                        </span>
+                    </div>
+                    <p class="text-slate-600 mb-4 min-h-[40px]">${task.description || 'No description provided.'}</p>
+                </div>
+                <div>
+                    <div class="flex items-center text-sm mb-4">
+                        <i class="fas fa-calendar-alt mr-2 text-slate-400"></i>
+                        <span class="${dateClass}">${formattedDate}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex space-x-2">
+                             <button class="edit-btn text-slate-500 hover:text-slate-700 transition-colors" title="Edit Task"><i class="fas fa-edit"></i></button>
+                            <button class="delete-btn text-red-400 hover:text-red-600 transition-colors" title="Delete Task"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Event Listeners for card buttons
+            card.querySelector('.edit-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                editTask(task);
+            });
+
+            card.querySelector('.delete-btn').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                showCustomConfirm('Are you sure you want to delete this task?', async () => {
+                     try {
+                         const taskRef = doc(db, `artifacts/${appId}/users/${currentUserId}/tasks`, task.id);
+                         await deleteDoc(taskRef);
+                     } catch(error) {
+                         console.error("Error deleting task: ", error);
+                         showCustomAlert("Could not delete task. Please try again.");
+                     }
+                });
+            });
+
+            return card;
+        };
+        
+        const editTask = (task) => {
+            modalTitle.textContent = 'Edit Task';
+            taskForm.reset();
+            document.getElementById('taskId').value = task.id;
+            document.getElementById('taskTitle').value = task.title;
+            document.getElementById('taskDesc').value = task.description;
+            document.getElementById('taskDueDate').value = task.dueDate;
+            document.getElementById('taskPriority').value = task.priority;
+            document.getElementById('taskStatus').value = task.status;
+            openModal();
+        }
+
+        // --- Filtering ---
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                currentFilter = button.dataset.filter;
+                
+                // Update button styles
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('bg-slate-600', 'text-white');
+                });
+                button.classList.add('bg-slate-600', 'text-white');
+
+                renderTasks();
+            });
+        });
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohit Wali - Frontend Developer & ML Engineer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+        }
+        /* Style for the 3D canvas to be in the background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place it behind all other content */
+        }
+        /* Ensure content is readable over the 3D background */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 antialiased">
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Header & Navigation -->
+        <header class="bg-gray-900/50 backdrop-blur-md shadow-lg shadow-indigo-500/10 sticky top-0 z-50">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold text-white">Mohit Wali</a>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#about" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300">About</a>
+                    <a href="#projects" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300">Projects</a>
+                    <a href="#skills" class="text-gray-300 hover:text-indigo-400 transition-colors duration-300">Skills</a>
+                    <a href="#contact" class="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-indigo-500 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">Contact Me</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden text-gray-300">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </nav>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+                <a href="#about" class="block py-2 text-gray-300 hover:text-indigo-400">About</a>
+                <a href="#projects" class="block py-2 text-gray-300 hover:text-indigo-400">Projects</a>
+                <a href="#skills" class="block py-2 text-gray-300 hover:text-indigo-400">Skills</a>
+                <a href="#contact" class="block mt-2 bg-indigo-600 text-white text-center px-4 py-2 rounded-lg shadow-md hover:bg-indigo-500">Contact Me</a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-6 py-12 md:py-20">
+
+            <!-- Hero Section -->
+            <section id="hero" class="text-center min-h-[70vh] flex flex-col justify-center items-center">
+                <div class="max-w-3xl">
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+                        Hi, I'm Mohit Wali
+                    </h1>
+                    <p class="text-xl md:text-2xl text-indigo-400 font-semibold mb-6">
+                        Frontend Developer & Machine Learning Engineer
+                    </p>
+                    <p class="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
+                        I build beautiful, responsive web applications and craft intelligent systems with data. Passionate about merging cutting-edge technology with elegant design.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                        <a href="#projects" class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-indigo-500 transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                            View My Work
+                        </a>
+                        <a href="#contact" class="bg-gray-800/50 backdrop-blur-sm text-indigo-300 px-8 py-3 rounded-lg font-semibold text-lg border border-indigo-500/30 shadow-sm hover:bg-gray-700/80 transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                            Get In Touch
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Me Section -->
+             <section id="about" class="py-20 md:py-32">
+                <div class="bg-gray-800/50 backdrop-blur-md p-8 md:p-12 rounded-2xl border border-gray-700/50">
+                    <div class="grid md:grid-cols-5 gap-12 items-center">
+                        <div class="md:col-span-2">
+                             <img src="https://placehold.co/600x600/111827/93C5FD?text=Mohit+Wali" alt="Mohit Wali" class="rounded-xl shadow-2xl shadow-indigo-900/30 w-full">
+                        </div>
+                        <div class="md:col-span-3">
+                            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">About Me</h2>
+                            <p class="text-lg text-gray-300 mb-4">
+                                Hello! I'm Mohit, a developer with a unique blend of skills in frontend engineering and machine learning. My passion lies in creating seamless user experiences powered by intelligent, data-driven backends.
+                            </p>
+                            <p class="text-lg text-gray-300 mb-4">
+                                With a strong foundation in computer science, I enjoy tackling complex problems, whether it's building a pixel-perfect UI with React and Tailwind CSS or developing a predictive model with Python and TensorFlow.
+                            </p>
+                             <p class="text-lg text-gray-300">
+                                I'm a lifelong learner, constantly exploring new technologies and methodologies to push the boundaries of what's possible on the web. Let's build something amazing together.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section id="projects" class="py-20 md:py-28">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white">Featured Projects</h2>
+                    <p class="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">A selection of my work, showcasing my skills in web development and machine learning.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-10">
+                    <!-- Project 1: Frontend -->
+                    <div class="bg-gray-800/50 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 group">
+                        <div class="p-8">
+                            <div class="flex items-center space-x-4 mb-4">
+                               <div class="bg-indigo-900/50 p-3 rounded-full border border-indigo-700/50">
+                                    <i data-lucide="layout-template" class="w-6 h-6 text-indigo-300"></i>
+                               </div>
+                               <div>
+                                    <h3 class="text-xl font-bold text-white">Kanban-Style Task Manager</h3>
+                                    <p class="text-sm font-medium text-indigo-400">Frontend Development</p>
+                               </div>
+                            </div>
+                            <p class="text-gray-400 mb-6">
+                                A responsive, drag-and-drop task management application . Users can create tasks, assign them to different status columns, and persist changes.
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">React</span>
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">Tailwind CSS</span>
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">dnd-kit</span>
+                            </div>
+                            <div class="flex space-x-4">
+                                <a href="#" class="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors duration-300 flex items-center">
+                                    Live Demo <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                                </a>
+                                <a href="#" class="font-semibold text-gray-400 hover:text-gray-200 transition-colors duration-300 flex items-center">
+                                    GitHub <i data-lucide="github" class="w-4 h-4 ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 2: Machine Learning -->
+                     <div class="bg-gray-800/50 backdrop-blur-md border border-gray-700/50 rounded-xl shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 group">
+                        <div class="p-8">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="bg-purple-900/50 p-3 rounded-full border border-purple-700/50">
+                                    <i data-lucide="brain-circuit" class="w-6 h-6 text-purple-300"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Sentiment Analysis API</h3>
+                                    <p class="text-sm font-medium text-purple-400">Machine Learning</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-400 mb-6">
+                                A REST API that classifies text as positive, negative, or neutral. Trained a custom LSTM model on a large dataset of movie reviews, achieving high accuracy.
+                            </p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">Python</span>
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">TensorFlow</span>
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">Flask</span>
+                                <span class="bg-gray-700 text-gray-300 text-xs font-semibold px-2.5 py-1 rounded-full">Docker</span>
+                            </div>
+                            <div class="flex space-x-4">
+                                 <a href="#" class="font-semibold text-gray-400 hover:text-gray-200 transition-colors duration-300 flex items-center">
+                                    GitHub <i data-lucide="github" class="w-4 h-4 ml-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section id="skills" class="py-20 md:py-32">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white">My Tech Stack</h2>
+                    <p class="text-lg text-gray-400 mt-4 max-w-2xl mx-auto">A list of technologies and tools I work with regularly.</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <!-- Skills columns -->
+                    <div class="text-center bg-gray-800/40 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-4 text-white">Frontend</h3>
+                        <ul class="space-y-2 text-gray-400">
+                            <li>HTML5 & CSS3</li>
+                            <li>JavaScript (ES6+)</li>
+                            <li>React & Next.js</li>
+                            <li>Tailwind CSS</li>
+                        </ul>
+                    </div>
+        
+                    <div class="text-center bg-gray-800/40 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-4 text-white">Machine Learning</h3>
+                         <ul class="space-y-2 text-gray-400">
+                            <li>TensorFlow & Keras</li>
+                            <li>Scikit-learn</li>
+                            <li>Pandas & NumPy</li>
+                            <li>Jupyter Notebooks</li>
+                        </ul>
+                    </div>
+                     <div class="text-center bg-gray-800/40 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-4 text-white">Tools & Platforms</h3>
+                        <ul class="space-y-2 text-gray-400">
+                            <li>Git & GitHub</li>
+                            <li>Docker</li>
+                            <li>Vercel & Netlify</li>
+                            <li>VS Code</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Contact Section -->
+            <section id="contact" class="py-20 md:py-28">
+                <div class="bg-gray-800/50 backdrop-blur-md p-8 md:p-12 rounded-2xl border border-gray-700/50 text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white">Let's Connect</h2>
+                    <p class="text-lg text-gray-400 mt-4 mb-8">I'm currently available for freelance projects and full-time opportunities. Feel free to reach out!</p>
+                    <a href="mailto:mohit.wali@example.com" class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-indigo-500 transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                        mohitwali70@gmail.com
+                    </a>
+                    <div class="flex justify-center space-x-6 mt-10">
+                        <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                            <i data-lucide="github" class="w-8 h-8"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                            <i data-lucide="linkedin" class="w-8 h-8"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors">
+                            <i data-lucide="twitter" class="w-8 h-8"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900/50">
+            <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+                <p>&copy; <span id="year"></span> Mohit Wali. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Three.js and script imports -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Basic Three.js Scene Setup ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.querySelector('#bg-canvas'),
+            alpha: true // Make canvas transparent
+        });
+
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 5;
+
+        // --- Create Particle System ---
+        const particlesCount = 5000;
+        const positions = new Float32Array(particlesCount * 3);
+        
+        for (let i = 0; i < particlesCount * 3; i++) {
+            // Position particles in a large sphere
+            positions[i] = (Math.random() - 0.5) * 20; 
+        }
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.02,
+            color: 0x818cf8, // Indigo color
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            opacity: 0.7
+        });
+
+        const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleSystem);
+        
+        // --- Mouse Interaction ---
+        const mouse = { x: 0, y: 0 };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // --- Scroll Interaction ---
+        let scrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+          scrollY = window.scrollY;
+        });
+
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate particles based on time
+            particleSystem.rotation.x += 0.0001;
+            particleSystem.rotation.y += 0.0002;
+            
+            // Move particles based on scroll
+            camera.position.y = -scrollY * 0.005;
+
+            // Subtle camera movement with mouse
+            camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.02;
+            // Tilt camera slightly with mouse Y
+            camera.rotation.x = -mouse.y * 0.05;
+
+
+            renderer.render(scene, camera);
+        }
+        animate(); // Start the animation
+
+        // --- Handle Window Resize ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- Lucide Icons and Mobile Menu ---
+        lucide.createIcons();
+
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        document.querySelectorAll('#mobile-menu a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                 mobileMenu.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
